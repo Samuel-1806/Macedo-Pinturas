@@ -1,0 +1,888 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Macedo Pinturas — Esmalte Industrial • PU • Epóxi</title>
+<meta name="description" content="Macedo Pinturas — pintura industrial de alto padrão. Esmalte Industrial, Poliuretano e Epóxi Vitrificado com acabamento impecável.">
+
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,500;0,9..144,600;0,9..144,700;1,9..144,500&family=IBM+Plex+Sans:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+<style>
+  /* ============================================================
+     TOKENS — paleta "esmalte molhado": grafite quente + cobre
+  ============================================================ */
+  :root{
+    --ink: #0A0C0F;
+    --ink-2: #12151A;
+    --panel: rgba(18,21,26,0.62);
+    --line: rgba(198,124,58,0.16);
+    --line-strong: rgba(198,124,58,0.4);
+
+    --copper: #C6803A;
+    --copper-light: #E8AD73;
+    --copper-glow: rgba(198,128,58,0.35);
+    --gloss: #9FE3DC;
+
+    --porcelain: #ECEDEF;
+    --steel: #8B93A0;
+
+    --font-display: 'Fraunces', serif;
+    --font-body: 'IBM Plex Sans', sans-serif;
+    --font-mono: 'IBM Plex Mono', monospace;
+
+    --container: 1200px;
+    --edge: clamp(1.5rem, 5vw, 5rem);
+  }
+
+  *,*::before,*::after{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+
+  body{
+    background: var(--ink);
+    color: var(--porcelain);
+    font-family: var(--font-body);
+    font-weight:300;
+    line-height:1.65;
+    -webkit-font-smoothing:antialiased;
+    overflow-x:hidden;
+  }
+
+  ::selection{ background: var(--copper); color:#0A0C0F; }
+
+  /* ============================================================
+     BACKGROUND: video + vinheta + grain
+  ============================================================ */
+  .bg-video-layer{
+    position:fixed; inset:0; width:100%; height:100%;
+    z-index:-3; overflow:hidden; background: var(--ink);
+  }
+  .bg-video-layer video{
+    position:absolute; top:50%; left:50%;
+    width:100%; height:100%;
+    object-fit:cover;
+    transform:translate(-50%,-50%);
+    opacity:0;
+    filter: saturate(0.85) brightness(0.75);
+    transition: opacity 1s ease;
+  }
+  .bg-video-layer video.is-ready{ opacity:0.5; }
+
+  /* wash ambiente — visível mesmo sem vídeo real */
+  .bg-video-layer::before{
+    content:"";
+    position:absolute; inset:0;
+    background:
+      radial-gradient(ellipse 55% 40% at 18% 8%, rgba(198,128,58,0.10), transparent 70%),
+      radial-gradient(ellipse 50% 45% at 88% 30%, rgba(159,227,220,0.05), transparent 70%),
+      radial-gradient(ellipse 60% 50% at 50% 100%, rgba(198,128,58,0.08), transparent 70%),
+      var(--ink);
+  }
+
+  /* VINHETA — escurece os cantos/bordas em todas as seções */
+  .vignette{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    background:
+      radial-gradient(120% 120% at 50% 50%, transparent 45%, rgba(0,0,0,0.55) 100%),
+      linear-gradient(180deg, rgba(0,0,0,0.5) 0%, transparent 12%, transparent 82%, rgba(0,0,0,0.65) 100%);
+  }
+
+  .grain{
+    position:fixed; inset:0; z-index:-1; pointer-events:none;
+    opacity:0.035;
+    background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='120' height='120'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  section{ background: transparent; position:relative; }
+
+  /* ============================================================
+     SHARED
+  ============================================================ */
+  .container{ max-width: var(--container); margin:0 auto; padding-inline: var(--edge); }
+
+  .tag{
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform:uppercase;
+    color: var(--copper-light);
+    display:inline-flex;
+    align-items:center;
+    gap:0.8em;
+  }
+  .tag::before{
+    content:"";
+    width:1.6em; height:1px;
+    background: var(--copper);
+  }
+
+  .copper-text{ color: var(--copper-light); }
+
+  h1,h2,h3{ font-family: var(--font-display); font-weight:500; letter-spacing:-0.01em; }
+
+  .btn-primary{
+    display:inline-flex; align-items:center; gap:0.75rem;
+    font-family: var(--font-mono);
+    font-size:0.82rem;
+    letter-spacing:0.06em;
+    color:#0A0C0F;
+    background: linear-gradient(135deg, var(--copper-light), var(--copper) 60%);
+    padding: 1.05rem 2.2rem;
+    border-radius: 3px;
+    text-decoration:none;
+    border:1px solid rgba(198,128,58,0.6);
+    box-shadow: 0 18px 40px -18px rgba(198,128,58,0.55);
+    transition: box-shadow .5s ease, transform .35s ease, filter .35s ease;
+    cursor:pointer;
+  }
+  .btn-primary:hover{
+    box-shadow: 0 0 32px 4px var(--copper-glow), 0 22px 44px -14px rgba(198,128,58,0.65);
+    transform: translateY(-2px);
+    filter:brightness(1.05);
+  }
+  .btn-primary svg{ width:14px; height:14px; transition:transform .35s ease; }
+  .btn-primary:hover svg{ transform: translateX(4px); }
+
+  .btn-ghost{
+    display:inline-flex; align-items:center; gap:0.6rem;
+    font-family:var(--font-mono);
+    font-size:0.78rem;
+    letter-spacing:0.06em;
+    color:var(--porcelain);
+    border:1px solid rgba(236,237,239,0.2);
+    padding:0.95rem 1.8rem;
+    border-radius:3px;
+    text-decoration:none;
+    transition:border-color .35s ease, color .35s ease, background .35s ease;
+  }
+  .btn-ghost:hover{ border-color:var(--copper); color:var(--copper-light); background:rgba(198,128,58,0.06); }
+
+  .reveal{ opacity:0; transform: translateY(26px); transition: opacity .9s cubic-bezier(.2,.7,.2,1), transform .9s cubic-bezier(.2,.7,.2,1); }
+  .reveal.is-visible{ opacity:1; transform:none; }
+
+  /* ============================================================
+     SIGNATURE — gota de esmalte / resina (blob glossy)
+  ============================================================ */
+  .resin-blob{
+    position:absolute;
+    border-radius: 62% 38% 55% 45% / 55% 45% 60% 40%;
+    background: radial-gradient(circle at 32% 28%, rgba(232,173,115,0.9), rgba(198,128,58,0.55) 38%, rgba(10,12,15,0.05) 72%);
+    filter: blur(2px);
+    animation: blobMorph 18s ease-in-out infinite;
+    pointer-events:none;
+  }
+  .resin-blob::after{
+    content:"";
+    position:absolute; inset:8%;
+    border-radius:inherit;
+    background: linear-gradient(115deg, rgba(255,255,255,0.55) 0%, transparent 22%, transparent 78%, rgba(159,227,220,0.25) 100%);
+    mix-blend-mode: screen;
+    opacity:0.7;
+  }
+  @keyframes blobMorph{
+    0%,100%{ border-radius: 62% 38% 55% 45% / 55% 45% 60% 40%; }
+    50%{ border-radius: 45% 55% 40% 60% / 40% 60% 45% 55%; }
+  }
+
+  /* ============================================================
+     NAV
+  ============================================================ */
+  .navbar{
+    position:fixed; top:0; left:0; right:0; z-index:100;
+    display:flex; align-items:center; justify-content:space-between;
+    padding: 1.3rem var(--edge);
+    background: rgba(8,9,11,0.2);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom:1px solid transparent;
+    transition: border-color .4s ease, background .4s ease, padding .4s ease;
+  }
+  .navbar.scrolled{ background: rgba(8,9,11,0.82); border-color: var(--line); padding-block:0.9rem; }
+
+  .brand{ display:flex; align-items:center; gap:0.7rem; text-decoration:none; color:var(--porcelain); }
+  .brand-mark{ width:34px; height:34px; display:flex; align-items:center; justify-content:center; }
+  .brand-name{
+    font-family:var(--font-display);
+    font-size:1.02rem;
+    letter-spacing:0.01em;
+    line-height:1.1;
+  }
+  .brand-name span{ display:block; font-size:0.6rem; color:var(--steel); letter-spacing:0.28em; margin-top:3px; font-family:var(--font-mono); text-transform:uppercase; }
+
+  .nav-links{ display:flex; align-items:center; gap:2.4rem; list-style:none; }
+  .nav-links a{
+    color:var(--porcelain);
+    text-decoration:none;
+    font-size:0.78rem;
+    letter-spacing:0.04em;
+    font-family:var(--font-mono);
+    position:relative; padding-bottom:4px;
+    opacity:0.8;
+    transition:opacity .3s ease, color .3s ease;
+  }
+  .nav-links a::after{
+    content:""; position:absolute; left:0; bottom:0; width:0; height:1px;
+    background:var(--copper); transition:width .35s ease;
+  }
+  .nav-links a:hover{ opacity:1; color:var(--copper-light); }
+  .nav-links a:hover::after{ width:100%; }
+
+  .nav-cta{
+    font-family:var(--font-mono);
+    font-size:0.74rem;
+    letter-spacing:0.04em;
+    color:#0A0C0F;
+    background: var(--copper-light);
+    padding:0.6rem 1.3rem;
+    border-radius:3px;
+    text-decoration:none;
+    transition: filter .3s ease, transform .3s ease;
+  }
+  .nav-cta:hover{ filter:brightness(1.08); transform:translateY(-1px); }
+
+  .nav-toggle{ display:none; background:none; border:none; cursor:pointer; padding:6px; }
+  .nav-toggle span{ display:block; width:22px; height:1px; background:var(--copper-light); margin:5px 0; transition:transform .3s ease, opacity .3s ease; }
+
+  /* ============================================================
+     1. HERO
+  ============================================================ */
+  #home{
+    min-height:100svh;
+    display:flex; align-items:center;
+    padding-top:6rem;
+    overflow:hidden;
+  }
+  .hero-grid{
+    display:grid;
+    grid-template-columns: 1.1fr 0.9fr;
+    align-items:center;
+    gap:2rem;
+    width:100%;
+  }
+  .hero-blob-wrap{
+    position:relative;
+    aspect-ratio:1/1;
+    display:flex; align-items:center; justify-content:center;
+  }
+  .hero-blob-wrap .resin-blob{ position:absolute; inset:8%; }
+  .hero-blob-wrap .spec{
+    position:relative; z-index:2;
+    font-family:var(--font-mono);
+    font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase;
+    color:rgba(10,12,15,0.75);
+    text-align:center;
+    max-width:8em;
+  }
+
+  .hero-eyebrow{ margin-bottom:1.6rem; }
+  .hero-title{
+    font-family:var(--font-display);
+    font-weight:600;
+    font-size: clamp(2.6rem, 6.4vw, 5.4rem);
+    letter-spacing:-0.01em;
+    line-height:1.02;
+    color:var(--porcelain);
+  }
+  .hero-title em{ font-style:italic; font-weight:500; color:var(--copper-light); }
+
+  .hero-sub{
+    margin-top:1.6rem;
+    font-family:var(--font-mono);
+    font-size:0.92rem;
+    color:var(--steel);
+    letter-spacing:0.02em;
+    max-width:34em;
+  }
+  .hero-sub .dot{ color:var(--copper); margin-inline:0.6em; }
+
+  .hero-actions{ margin-top:2.6rem; display:flex; gap:1.1rem; flex-wrap:wrap; }
+
+  .scroll-cue{
+    position:absolute; bottom: clamp(1.6rem, 4vh, 3rem); left: var(--edge);
+    display:flex; align-items:center; gap:0.9rem; color:var(--steel);
+  }
+  .scroll-cue span{ font-family:var(--font-mono); font-size:0.66rem; letter-spacing:0.2em; text-transform:uppercase; }
+  .scroll-cue .line{ width:46px; height:1px; background:linear-gradient(90deg, var(--copper), transparent); position:relative; overflow:hidden; }
+  .scroll-cue .line::after{
+    content:""; position:absolute; top:0; left:-20px; width:20px; height:100%;
+    background:linear-gradient(90deg, transparent, var(--porcelain));
+    animation: cueDrop 2.2s ease-in-out infinite;
+  }
+  @keyframes cueDrop{ 0%{ left:-20px; } 100%{ left:46px; } }
+
+  /* ============================================================
+     SECTION HEADERS
+  ============================================================ */
+  .sec-pad{ padding: clamp(5rem, 10vw, 8.5rem) 0; }
+  .sec-head{ max-width:640px; margin-bottom: clamp(3rem, 6vw, 4.5rem); }
+  .sec-head.center{ margin-inline:auto; text-align:center; }
+  .sec-title{
+    margin-top:0.9rem;
+    font-size: clamp(1.9rem, 4vw, 2.9rem);
+    color:var(--porcelain);
+  }
+
+  /* ============================================================
+     2. ABOUT
+  ============================================================ */
+  #about .about-grid{
+    display:grid;
+    grid-template-columns: 0.85fr 1.15fr;
+    gap: clamp(2.5rem, 6vw, 5rem);
+    align-items:center;
+  }
+
+  /* diagrama de camadas — em vez de foto-placeholder */
+  .layer-diagram{
+    border:1px solid var(--line);
+    padding: 2rem 1.8rem;
+    background: rgba(18,21,26,0.4);
+  }
+  .layer-diagram .layer{
+    position:relative;
+    height:64px;
+    margin-bottom:14px;
+    border-radius:2px;
+    display:flex; align-items:center;
+    padding-inline:1.1rem;
+    font-family:var(--font-mono);
+    font-size:0.7rem;
+    letter-spacing:0.1em;
+    text-transform:uppercase;
+    color:rgba(10,12,15,0.7);
+    overflow:hidden;
+  }
+  .layer:last-child{ margin-bottom:0; }
+  .layer-base{ background: linear-gradient(90deg, #5b5147, #7a6c58); height:52px; }
+  .layer-fundo{ background: linear-gradient(90deg, #8a5a2c, #b57a3f); height:58px; }
+  .layer-acab{
+    background: linear-gradient(115deg, var(--copper-light), var(--copper) 55%, var(--copper-light));
+    box-shadow: inset 0 0 24px rgba(255,255,255,0.35);
+  }
+  .layer-acab::after{
+    content:""; position:absolute; inset:0;
+    background: linear-gradient(115deg, rgba(255,255,255,0.6), transparent 30%);
+    mix-blend-mode:screen;
+  }
+  .layer-caption{ margin-top:1.2rem; font-family:var(--font-mono); font-size:0.68rem; color:var(--steel); letter-spacing:0.06em; }
+
+  .about-copy p{ color:var(--steel); font-size:1.02rem; margin-bottom:1.4rem; }
+  .about-copy p:first-of-type{ font-family:var(--font-display); font-size:1.32rem; font-style:italic; color:var(--porcelain); line-height:1.55; }
+  .about-copy strong{ color:var(--copper-light); font-weight:500; }
+
+  .about-pillars{
+    margin-top:2.2rem;
+    display:flex; gap:0.7rem; flex-wrap:wrap;
+  }
+  .pillar{
+    font-family:var(--font-mono);
+    font-size:0.72rem; letter-spacing:0.08em; text-transform:uppercase;
+    color:var(--copper-light);
+    border:1px solid var(--line-strong);
+    padding:0.55rem 1rem;
+    border-radius:999px;
+  }
+
+  /* ============================================================
+     3. SERVICES — ficha técnica
+  ============================================================ */
+  .services-list{ display:flex; flex-direction:column; }
+  .service-row{
+    display:grid;
+    grid-template-columns: 100px 46px 1fr;
+    gap: clamp(1.2rem, 3vw, 2.4rem);
+    align-items:start;
+    padding: 2.2rem 0;
+    border-top:1px solid var(--line);
+    transition: background .4s ease;
+  }
+  .service-row:last-child{ border-bottom:1px solid var(--line); }
+  .service-row:hover{ background: rgba(198,128,58,0.035); }
+  .service-tag{
+    font-family:var(--font-mono);
+    font-size:0.72rem; letter-spacing:0.1em; color:var(--copper-light);
+    padding-top:0.3rem;
+  }
+  .service-icon{ width:38px; height:38px; color:var(--copper-light); }
+  .service-body h3{ font-size:1.4rem; color:var(--porcelain); margin-bottom:0.6rem; }
+  .service-body p{ color:var(--steel); font-size:0.96rem; max-width:52em; }
+
+  /* ============================================================
+     4. DIFFERENTIALS
+  ============================================================ */
+  #differentials{ position:relative; }
+  .diff-wrap{
+    display:grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 4rem);
+    align-items:start;
+  }
+  .diff-lead{ position:sticky; top:8rem; }
+  .diff-lead .sec-title{ margin-top:0.9rem; }
+  .diff-lead p{ color:var(--steel); margin-top:1.4rem; font-size:1.02rem; max-width:420px; }
+
+  .diff-list{ display:flex; flex-direction:column; }
+  .diff-item{
+    padding: 1.9rem 0;
+    border-top:1px solid var(--line);
+    display:grid;
+    grid-template-columns: 52px 1fr;
+    gap:1.6rem;
+    align-items:start;
+  }
+  .diff-item:last-child{ border-bottom:1px solid var(--line); }
+  .diff-num{ font-family:var(--font-mono); color:var(--copper-light); font-size:0.85rem; opacity:0.85; }
+  .diff-item h4{ font-family:var(--font-display); font-size:1.24rem; color:var(--porcelain); margin-bottom:0.5rem; font-weight:500; }
+  .diff-item p{ color:var(--steel); font-size:0.94rem; }
+
+  /* ============================================================
+     5. CONTACT / FOOTER
+  ============================================================ */
+  #contact{ padding-top: clamp(5rem, 10vw, 8.5rem); padding-bottom:2.5rem; }
+  .contact-panel{
+    position:relative;
+    padding: clamp(2.8rem, 6vw, 5.2rem);
+    text-align:center;
+    border:1px solid var(--line);
+    background: rgba(18,21,26,0.45);
+    overflow:hidden;
+  }
+  .contact-panel .resin-blob{
+    position:absolute; width:340px; height:340px;
+    top:-90px; right:-90px; opacity:0.5; z-index:0;
+  }
+  .contact-panel > *{ position:relative; z-index:1; }
+  .contact-panel .tag{ display:inline-flex; justify-content:center; }
+  .contact-title{
+    margin-top:1rem;
+    font-size:clamp(1.9rem, 4.6vw, 3.1rem);
+    max-width:760px;
+    margin-inline:auto;
+  }
+  .contact-title em{ font-style:italic; color:var(--copper-light); }
+  .contact-panel > .btn-primary{ margin-top:2.4rem; }
+
+  .contact-grid{
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+    display:grid;
+    grid-template-columns:repeat(4,1fr);
+    gap:1px;
+    background:var(--line);
+    border:1px solid var(--line);
+  }
+  .contact-item{ background:rgba(10,12,15,0.55); padding: 1.8rem 1.2rem; text-align:center; }
+  .contact-item .label{
+    font-family:var(--font-mono); font-size:0.62rem; letter-spacing:0.14em; text-transform:uppercase;
+    color:var(--copper-light); margin-bottom:0.6rem;
+  }
+  .contact-item a, .contact-item span.value{ color:var(--porcelain); text-decoration:none; font-size:0.92rem; }
+  .contact-item a:hover{ color:var(--copper-light); }
+
+  footer.site-footer{
+    margin-top: clamp(3rem, 6vw, 4.5rem);
+    display:flex; align-items:center; justify-content:space-between;
+    flex-wrap:wrap; gap:1rem;
+    padding-top:2rem;
+    border-top:1px solid var(--line);
+    font-family:var(--font-mono);
+    font-size:0.74rem;
+    color:var(--steel);
+  }
+  footer.site-footer .fbrand{ font-family:var(--font-display); font-style:italic; color:var(--porcelain); }
+
+  /* ============================================================
+     RESPONSIVE
+  ============================================================ */
+  @media (max-width: 980px){
+    .hero-grid{ grid-template-columns:1fr; }
+    .hero-blob-wrap{ display:none; }
+    .about-grid{ grid-template-columns:1fr; }
+    .diff-wrap{ grid-template-columns:1fr; }
+    .diff-lead{ position:static; margin-bottom:1rem; }
+    .service-row{ grid-template-columns: 70px 1fr; }
+    .service-icon{ display:none; }
+    .contact-grid{ grid-template-columns:repeat(2,1fr); }
+  }
+
+  @media (max-width: 760px){
+    .nav-links, .nav-cta{ display:none; }
+    .nav-toggle{ display:block; }
+    .navbar.open .nav-links{
+      display:flex; position:absolute; top:100%; left:0; right:0;
+      flex-direction:column; align-items:flex-start; gap:1.1rem;
+      background:rgba(8,9,11,0.96); backdrop-filter:blur(16px);
+      border-bottom:1px solid var(--line); padding:1.6rem var(--edge) 2rem;
+    }
+    .navbar.open .nav-cta{ display:inline-flex; margin-top:0.4rem; }
+    .contact-grid{ grid-template-columns:1fr; }
+  }
+
+  @media (prefers-reduced-motion: reduce){
+    *{ animation-duration:0.001ms !important; animation-iteration-count:1 !important; transition-duration:0.001ms !important; scroll-behavior:auto !important; }
+  }
+
+  a:focus-visible, button:focus-visible{ outline: 1px solid var(--copper-light); outline-offset:3px; }
+</style>
+</head>
+<body>
+
+  <!-- ============ BACKGROUND: VÍDEO + VINHETA + GRAIN ============ -->
+  <div class="bg-video-layer" id="bgVideoLayer">
+    <video id="scrollVideo" muted playsinline preload="auto">
+      <source src="showreel.mp4" type="video/mp4">
+    </video>
+  </div>
+  <div class="vignette"></div>
+  <div class="grain"></div>
+
+  <!-- ============ NAVIGATION ============ -->
+  <nav class="navbar" id="navbar">
+    <a href="#home" class="brand">
+      <span class="brand-mark" aria-hidden="true">
+        <svg width="34" height="34" viewBox="0 0 34 34" fill="none">
+          <circle cx="17" cy="17" r="15.5" stroke="#C6803A" stroke-width="1"/>
+          <text x="17" y="22" text-anchor="middle" font-family="Fraunces, serif" font-size="14" fill="#E8AD73">M</text>
+        </svg>
+      </span>
+      <span class="brand-name">Macedo<span>Pinturas</span></span>
+    </a>
+
+    <ul class="nav-links">
+      <li><a href="#about">Quem Somos</a></li>
+      <li><a href="#services">Serviços</a></li>
+      <li><a href="#differentials">Diferenciais</a></li>
+      <li><a href="#contact">Contato</a></li>
+    </ul>
+
+    <a href="#contact" class="nav-cta">Orçamento</a>
+
+    <button class="nav-toggle" id="navToggle" aria-label="Abrir menu" aria-expanded="false">
+      <span></span><span></span><span></span>
+    </button>
+  </nav>
+
+  <main>
+
+    <!-- ============ 1. HOME / HERO ============ -->
+    <section id="home">
+      <div class="container hero-grid">
+        <div>
+          <span class="tag hero-eyebrow">Pintura Industrial de Alto Padrão</span>
+          <h1 class="hero-title">Precisão que<br><em>vira acabamento</em></h1>
+          <p class="hero-sub">Esmalte Industrial <span class="dot">•</span> Poliuretano <span class="dot">•</span> Epóxi Vitrificado — camada após camada, até o ponto exato.</p>
+
+          <div class="hero-actions">
+            <a href="#contact" class="btn-primary">
+              Solicitar Orçamento
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+            </a>
+            <a href="#services" class="btn-ghost">Nossos Serviços</a>
+          </div>
+        </div>
+
+        <div class="hero-blob-wrap" aria-hidden="true">
+          <div class="resin-blob" style="width:100%; height:100%;"></div>
+          <span class="spec">ACAB.01<br>Espelhado</span>
+        </div>
+      </div>
+
+      <div class="scroll-cue" aria-hidden="true">
+        <span>Explorar</span>
+        <div class="line"></div>
+      </div>
+    </section>
+
+    <!-- ============ 2. ABOUT ============ -->
+    <section id="about" class="sec-pad">
+      <div class="container">
+        <div class="about-grid">
+
+          <div class="layer-diagram reveal">
+            <div class="layer layer-base"></div>
+            <div class="layer layer-fundo"></div>
+            <div class="layer layer-acab"></div>
+            <p class="layer-caption">Base · Fundo Protetor · Acabamento — cada camada com sua função</p>
+          </div>
+
+          <div class="about-copy">
+            <span class="tag reveal">Quem Somos</span>
+            <h2 class="sec-title reveal">Técnica apurada, acabamento de excelência</h2>
+
+            <div style="margin-top:1.8rem;">
+              <p class="reveal">Cada superfície carrega uma história — e cada camada aplicada por nós é escrita com precisão milimétrica, respeito ao material e obsessão pelo detalhe.</p>
+              <p class="reveal">Há anos dedicados à pintura industrial e automotiva de alto padrão, construímos uma reputação baseada em três pilares inegociáveis: <strong>confiança</strong> no processo, <strong>qualidade</strong> em cada demão e <strong>excelência</strong> no resultado final. Trabalhamos com equipamentos profissionais de pulverização, ambientes controlados e um olhar treinado para identificar imperfeições invisíveis a olhos leigos.</p>
+              <p class="reveal">Do primeiro contato à entrega final, tratamos cada projeto — seja uma estrutura industrial, um piso ou uma peça automotiva — como uma obra que carrega nossa assinatura.</p>
+            </div>
+
+            <div class="about-pillars reveal">
+              <span class="pillar">Confiança</span>
+              <span class="pillar">Qualidade</span>
+              <span class="pillar">Excelência</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 3. SERVICES ============ -->
+    <section id="services" class="sec-pad">
+      <div class="container">
+        <div class="sec-head center">
+          <span class="tag reveal" style="justify-content:center;">Ficha Técnica</span>
+          <h2 class="sec-title reveal">Três especialidades. Um único padrão de perfeição.</h2>
+        </div>
+
+        <div class="services-list">
+
+          <div class="service-row reveal">
+            <span class="service-tag">MAT.01<br>Proteção</span>
+            <div class="service-icon">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
+                <path d="M24 4 L42 12 V24 C42 34 34 42 24 44 C14 42 6 34 6 24 V12 Z"/>
+                <path d="M17 24 L22 29 L32 18" stroke-linecap="round" stroke-linejoin="round"/>
+              </svg>
+            </div>
+            <div class="service-body">
+              <h3>Esmalte Industrial</h3>
+              <p>Proteção de alta resistência contra corrosão, impacto e desgaste, desenvolvida para estruturas e equipamentos que exigem durabilidade sem abrir mão do acabamento impecável.</p>
+            </div>
+          </div>
+
+          <div class="service-row reveal">
+            <span class="service-tag">MAT.02<br>Brilho</span>
+            <div class="service-icon">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
+                <circle cx="24" cy="24" r="18"/>
+                <path d="M24 6 C30 14 30 34 24 42" />
+                <path d="M8 24 C18 20 30 20 40 24" />
+              </svg>
+            </div>
+            <div class="service-body">
+              <h3>Poliuretano / PU</h3>
+              <p>Brilho estonteante e acabamento de nível automotivo. O PU entrega profundidade de cor, espelhamento e uma superfície lisa como vidro para peças que exigem sofisticação absoluta.</p>
+            </div>
+          </div>
+
+          <div class="service-row reveal">
+            <span class="service-tag">MAT.03<br>Superfície</span>
+            <div class="service-icon">
+              <svg viewBox="0 0 48 48" fill="none" stroke="currentColor" stroke-width="1.2">
+                <rect x="6" y="6" width="36" height="36" rx="1"/>
+                <path d="M6 24 H42 M24 6 V42"/>
+              </svg>
+            </div>
+            <div class="service-body">
+              <h3>Epóxi Vitrificado</h3>
+              <p>Revestimento industrial impecável e espelhado para pisos de alta performance — resistência química, higiene absoluta e um acabamento visualmente contínuo e luxuoso.</p>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 4. DIFFERENTIALS ============ -->
+    <section id="differentials" class="sec-pad">
+      <div class="container">
+        <div class="diff-wrap">
+
+          <div class="diff-lead reveal">
+            <span class="tag">Diferenciais</span>
+            <h2 class="sec-title">Comprometidos com a perfeição absoluta</h2>
+            <p>Equipamentos profissionais, ambiente controlado e execução impecável — sem excessos, sem falhas, sem retrabalho.</p>
+          </div>
+
+          <div class="diff-list">
+            <div class="diff-item reveal">
+              <span class="diff-num">01</span>
+              <div>
+                <h4>Equipamento Profissional</h4>
+                <p>Pistolas de pulverização a compressor calibradas para névoa fina e uniforme, garantindo cobertura homogênea em cada centímetro da superfície.</p>
+              </div>
+            </div>
+            <div class="diff-item reveal">
+              <span class="diff-num">02</span>
+              <div>
+                <h4>Execução Sem Falhas</h4>
+                <p>Preparo minucioso da superfície, controle rigoroso de espessura e camadas, e inspeção visual sob luz direcionada antes da entrega.</p>
+              </div>
+            </div>
+            <div class="diff-item reveal">
+              <span class="diff-num">03</span>
+              <div>
+                <h4>Zero Bagunça</h4>
+                <p>Proteção total do entorno, isolamento da área de trabalho e limpeza completa ao final — como se nunca tivéssemos estado lá, exceto pelo resultado.</p>
+              </div>
+            </div>
+            <div class="diff-item reveal">
+              <span class="diff-num">04</span>
+              <div>
+                <h4>Materiais de Alta Performance</h4>
+                <p>Seleção criteriosa de tintas, resinas e vernizes de linhas industriais premium, compatíveis com cada tipo de superfície e uso.</p>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 5. CONTACT / FOOTER ============ -->
+    <section id="contact">
+      <div class="container">
+        <div class="contact-panel reveal">
+          <div class="resin-blob" aria-hidden="true"></div>
+          <span class="tag">Contato &amp; Orçamento</span>
+          <h2 class="contact-title">Transforme sua superfície em uma <em>obra de precisão</em></h2>
+
+          <a href="https://wa.me/5515991591319" target="_blank" rel="noopener" class="btn-primary">
+            Solicitar Orçamento Gratuito
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M5 12h14M13 6l6 6-6 6"/></svg>
+          </a>
+
+          <div class="contact-grid">
+            <div class="contact-item">
+              <div class="label">WhatsApp</div>
+              <a href="https://wa.me/5515991591319" target="_blank" rel="noopener">(15) 99159-1319</a>
+            </div>
+            <div class="contact-item">
+              <div class="label">E-mail</div>
+              <a href="mailto:manoelmacedo22@gmail.com">manoelmacedo22@gmail.com</a>
+            </div>
+            <div class="contact-item">
+              <div class="label">Atendimento</div>
+              <span class="value">Laranjal Paulista e região</span>
+            </div>
+            <div class="contact-item">
+              <div class="label">Instagram</div>
+              <a href="https://instagram.com/macedopinturas" target="_blank" rel="noopener">@macedopinturas</a>
+            </div>
+          </div>
+        </div>
+
+        <footer class="site-footer">
+          <span class="fbrand">Macedo Pinturas</span>
+          <span>&copy; <span id="year"></span> Todos os direitos reservados.</span>
+        </footer>
+      </div>
+    </section>
+
+  </main>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+
+  <script>
+    // ============================================================
+    // SCROLL-DRIVEN BACKGROUND VIDEO — versão corrigida
+    //
+    // O problema do vídeo "picotado" normalmente tem DUAS causas:
+    //   1) O currentTime é reatribuído a cada evento de scroll, mas o
+    //      navegador ainda está processando o "seek" anterior — os
+    //      pedidos se acumulam e o vídeo só atualiza quando o scroll
+    //      pára (fila de seeks). Corrigido abaixo com o padrão
+    //      "seeked-gate": só pedimos um novo seek quando o anterior
+    //      terminou, sempre mirando no alvo mais recente.
+    //   2) O vídeo fonte tem poucos keyframes (GOP longo). Isso é um
+    //      problema de CODIFICAÇÃO do arquivo .mp4, não de código —
+    //      veja a nota no fim deste bloco.
+    // ============================================================
+    (function initScrollVideo(){
+      const video = document.getElementById('scrollVideo');
+      if (!video) return;
+
+      let duration = 0;
+      let targetTime = 0;
+      let appliedTime = -1;
+      let seeking = false;
+      let ready = false;
+
+      function trySeek(){
+        if (seeking) return;
+        if (Math.abs(targetTime - appliedTime) < 0.01) return;
+        seeking = true;
+        appliedTime = targetTime;
+        video.currentTime = targetTime;
+      }
+
+      video.addEventListener('seeked', () => {
+        seeking = false;
+        trySeek(); // aplica o alvo mais recente, se mudou enquanto buscava
+      });
+
+      function bindScrub(){
+        if (ready) return;
+        ready = true;
+        duration = video.duration;
+        video.classList.add('is-ready');
+        video.pause();
+
+        gsap.registerPlugin(ScrollTrigger);
+
+        ScrollTrigger.create({
+          trigger: document.documentElement,
+          start: 'top top',
+          end: 'bottom bottom',
+          scrub: 0.35, // pequeno amortecimento do próprio GSAP = leitura mais fluida
+          onUpdate: (self) => {
+            targetTime = self.progress * duration;
+            trySeek();
+          }
+        });
+      }
+
+      if (video.readyState >= 1 && video.duration) {
+        bindScrub();
+      } else {
+        video.addEventListener('loadedmetadata', bindScrub, { once: true });
+      }
+
+      video.addEventListener('error', () => {
+        video.style.display = 'none';
+      });
+
+      // NOTA: se mesmo assim o vídeo continuar "travando entre frames",
+      // reencode o .mp4 com keyframe em todo frame, para permitir seek
+      // instantâneo em qualquer ponto:
+      //   ffmpeg -i showreel.mp4 -an -g 1 -crf 20 -pix_fmt yuv420p showreel-scrub.mp4
+    })();
+
+    // Navbar scroll state
+    const navbar = document.getElementById('navbar');
+    window.addEventListener('scroll', () => {
+      navbar.classList.toggle('scrolled', window.scrollY > 40);
+    }, { passive: true });
+
+    // Mobile nav toggle
+    const navToggle = document.getElementById('navToggle');
+    navToggle.addEventListener('click', () => {
+      const open = navbar.classList.toggle('open');
+      navToggle.setAttribute('aria-expanded', open);
+    });
+    document.querySelectorAll('.nav-links a').forEach(a => {
+      a.addEventListener('click', () => {
+        navbar.classList.remove('open');
+        navToggle.setAttribute('aria-expanded', 'false');
+      });
+    });
+
+    // Scroll reveal
+    const revealEls = document.querySelectorAll('.reveal');
+    const io = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          entry.target.classList.add('is-visible');
+          io.unobserve(entry.target);
+        }
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    revealEls.forEach(el => io.observe(el));
+
+    document.getElementById('year').textContent = new Date().getFullYear();
+  </script>
+
+</body>
+</html>
