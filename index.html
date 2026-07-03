@@ -531,7 +531,7 @@
   <!-- ============ BACKGROUND: VÍDEO + VINHETA + GRAIN ============ -->
   <div class="bg-video-layer" id="bgVideoLayer">
     <video id="scrollVideo" muted playsinline preload="auto">
-      <source src="showreel.mp4" type="video/mp4">
+      <source src="showreel-scrub.mp4" type="video/mp4">
     </video>
   </div>
   <div class="vignette"></div>
@@ -844,10 +844,16 @@
         video.style.display = 'none';
       });
 
-      // NOTA: se mesmo assim o vídeo continuar "travando entre frames",
-      // reencode o .mp4 com keyframe em todo frame, para permitir seek
-      // instantâneo em qualquer ponto:
-      //   ffmpeg -i showreel.mp4 -an -g 1 -crf 20 -pix_fmt yuv420p showreel-scrub.mp4
+      // NOTA: o arquivo original (showreel.mp4) tinha só 8 keyframes em
+      // 1441 frames (GOP ~180 = 6s), por isso o "travamento": cada seek
+      // do scroll obrigava o navegador a decodificar dezenas/centenas de
+      // frames a partir do keyframe anterior. showreel-scrub.mp4 foi
+      // reencodado com keyframe a cada ~11 frames (0.4s) e resolução
+      // menor (960x540), permitindo seek quase instantâneo em qualquer
+      // ponto do scroll — e ainda ficou ~45% menor em tamanho de arquivo:
+      //   ffmpeg -i showreel.mp4 -an -g 12 -sc_threshold 0 -crf 26 \
+      //     -preset slow -pix_fmt yuv420p -vf "scale=960:-2" \
+      //     -movflags +faststart showreel-scrub.mp4
     })();
 
     // Navbar scroll state
